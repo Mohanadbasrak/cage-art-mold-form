@@ -1,1 +1,1086 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Özel Kalıp Talebi — Cage Art Studio</title>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@300;400;500&display=swap');
 
+  :root {
+    --graphite:    #2a2a2a;
+    --graphite-2:  #1a1a1a;
+    --bone:        #f5f0e8;
+    --bone-2:      #ece6d9;
+    --copper:      #b87333;
+    --copper-light:#d4934a;
+    --muted:       #7a7169;
+    --border:      #3e3830;
+    --error:       #c0392b;
+    --success:     #4a7c59;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--graphite-2);
+    color: var(--bone);
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+  }
+
+  /* ── Wrapper ── */
+  .form-shell {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 40px 24px 60px;
+  }
+
+  /* ── Header ── */
+  .form-header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  .form-header .eyebrow {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--copper);
+    margin-bottom: 12px;
+    display: block;
+  }
+  .form-header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(26px, 5vw, 36px);
+    font-weight: 500;
+    line-height: 1.2;
+    color: var(--bone);
+    margin-bottom: 12px;
+  }
+  .form-header p {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.7;
+    max-width: 460px;
+    margin: 0 auto;
+  }
+
+  /* ── Progress ── */
+  .progress-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 44px;
+  }
+  .step-dot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    position: relative;
+  }
+  .step-dot .dot {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    background: var(--graphite);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    transition: all .3s ease;
+    position: relative;
+    z-index: 1;
+  }
+  .step-dot .label {
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    white-space: nowrap;
+    transition: color .3s ease;
+  }
+  .step-dot.active .dot {
+    border-color: var(--copper);
+    background: var(--copper);
+    color: var(--graphite-2);
+    font-weight: 600;
+  }
+  .step-dot.active .label { color: var(--copper); }
+  .step-dot.done .dot {
+    border-color: var(--copper);
+    background: transparent;
+    color: var(--copper);
+  }
+  .step-dot.done .label { color: var(--muted); }
+  .step-connector {
+    width: 60px;
+    height: 1px;
+    background: var(--border);
+    margin-bottom: 22px;
+    transition: background .3s ease;
+    flex-shrink: 0;
+  }
+  .step-connector.done { background: var(--copper); }
+
+  /* ── Card ── */
+  .form-card {
+    background: var(--graphite);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 36px 32px;
+  }
+
+  .step-panel { display: none; }
+  .step-panel.active { display: block; }
+
+  .step-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--bone);
+    margin-bottom: 4px;
+  }
+  .step-desc {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 28px;
+    line-height: 1.6;
+  }
+
+  /* ── Fields ── */
+  .field-group {
+    margin-bottom: 20px;
+  }
+  .field-group label {
+    display: block;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .field-group label .req {
+    color: var(--copper);
+    margin-left: 2px;
+  }
+  .field-group input,
+  .field-group textarea,
+  .field-group select {
+    width: 100%;
+    background: var(--graphite-2);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--bone);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 300;
+    padding: 12px 14px;
+    outline: none;
+    transition: border-color .2s ease;
+    -webkit-appearance: none;
+  }
+  .field-group input::placeholder,
+  .field-group textarea::placeholder { color: #4a4540; }
+  .field-group input:focus,
+  .field-group textarea:focus,
+  .field-group select:focus {
+    border-color: var(--copper);
+  }
+  .field-group textarea { resize: vertical; min-height: 100px; }
+  .field-group select {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a7169' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+  }
+
+  .field-hint {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 6px;
+    line-height: 1.5;
+  }
+  .field-error {
+    font-size: 11px;
+    color: var(--error);
+    margin-top: 6px;
+    display: none;
+  }
+  .field-group.has-error input,
+  .field-group.has-error textarea,
+  .field-group.has-error select {
+    border-color: var(--error);
+  }
+  .field-group.has-error .field-error { display: block; }
+
+  /* ── Upload Zone ── */
+  .upload-zone {
+    border: 1.5px dashed var(--border);
+    border-radius: 3px;
+    padding: 28px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color .2s ease, background .2s ease;
+    position: relative;
+    background: var(--graphite-2);
+  }
+  .upload-zone:hover, .upload-zone.drag-over {
+    border-color: var(--copper);
+    background: rgba(184,115,51,.04);
+  }
+  .upload-zone input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+    border: none;
+    padding: 0;
+    background: none;
+  }
+  .upload-zone input[type="file"]:focus { border: none; }
+  .upload-icon {
+    width: 32px;
+    height: 32px;
+    margin: 0 auto 10px;
+    opacity: .4;
+  }
+  .upload-zone .uz-label {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+  .upload-zone .uz-label span {
+    color: var(--copper-light);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .upload-zone .uz-types {
+    font-size: 10px;
+    color: #4a4540;
+    margin-top: 6px;
+    letter-spacing: .5px;
+  }
+  .file-list {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .file-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(184,115,51,.1);
+    border: 1px solid rgba(184,115,51,.25);
+    border-radius: 3px;
+    padding: 6px 10px;
+    font-size: 12px;
+    color: var(--bone-2);
+  }
+  .file-chip .fc-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .file-chip .fc-size { color: var(--muted); font-size: 11px; flex-shrink: 0; }
+  .file-chip .fc-remove {
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 16px;
+    line-height: 1;
+    flex-shrink: 0;
+    transition: color .15s;
+  }
+  .file-chip .fc-remove:hover { color: var(--error); }
+
+  /* ── 3D File Toggle ── */
+  .radio-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .radio-card {
+    border: 1.5px solid var(--border);
+    border-radius: 3px;
+    padding: 16px 14px;
+    cursor: pointer;
+    transition: border-color .2s, background .2s;
+    position: relative;
+  }
+  .radio-card input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0; height: 0;
+  }
+  .radio-card:has(input:checked) {
+    border-color: var(--copper);
+    background: rgba(184,115,51,.06);
+  }
+  .radio-card .rc-icon {
+    font-size: 22px;
+    margin-bottom: 8px;
+  }
+  .radio-card .rc-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--bone);
+    margin-bottom: 4px;
+  }
+  .radio-card .rc-desc {
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .radio-card:has(input:checked) .rc-title { color: var(--copper-light); }
+
+  /* ── Conditional panel ── */
+  .conditional-panel {
+    margin-top: 16px;
+    display: none;
+  }
+  .conditional-panel.visible { display: block; }
+  .info-box {
+    background: rgba(74,124,89,.08);
+    border: 1px solid rgba(74,124,89,.25);
+    border-radius: 3px;
+    padding: 12px 14px;
+    font-size: 12px;
+    color: #8ab89a;
+    line-height: 1.6;
+    margin-top: 16px;
+  }
+  .info-box.warning {
+    background: rgba(184,115,51,.07);
+    border-color: rgba(184,115,51,.25);
+    color: var(--copper-light);
+  }
+
+  /* ── Row ── */
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  @media (max-width: 480px) {
+    .field-row { grid-template-columns: 1fr; }
+    .radio-cards { grid-template-columns: 1fr; }
+  }
+
+  /* ── Divider ── */
+  .form-divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 24px 0;
+  }
+
+  /* ── Buttons ── */
+  .btn-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 32px;
+    gap: 12px;
+  }
+  .btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    padding: 13px 28px;
+    transition: all .2s ease;
+  }
+  .btn-primary {
+    background: var(--copper);
+    color: var(--graphite-2);
+    flex: 1;
+    max-width: 260px;
+  }
+  .btn-primary:hover { background: var(--copper-light); }
+  .btn-primary:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+  }
+  .btn-ghost {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    padding: 12px 20px;
+  }
+  .btn-ghost:hover { color: var(--bone); border-color: var(--muted); }
+
+  /* ── Summary (Step 3) ── */
+  .summary-block {
+    background: var(--graphite-2);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+  }
+  .summary-block .sb-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--copper);
+    margin-bottom: 10px;
+  }
+  .sb-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(62,56,48,.5);
+    font-size: 13px;
+  }
+  .sb-row:last-child { border-bottom: none; }
+  .sb-row .sbr-key { color: var(--muted); font-size: 11px; flex-shrink: 0; }
+  .sb-row .sbr-val { color: var(--bone); text-align: right; word-break: break-word; }
+  .sb-files {
+    margin-top: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .sb-file-tag {
+    font-size: 10px;
+    background: rgba(184,115,51,.12);
+    color: var(--copper-light);
+    border: 1px solid rgba(184,115,51,.2);
+    border-radius: 2px;
+    padding: 3px 8px;
+  }
+  .kvkk-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: 4px;
+  }
+  .kvkk-check input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    accent-color: var(--copper);
+    cursor: pointer;
+  }
+  .kvkk-check label {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+    cursor: pointer;
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: 300;
+  }
+
+  /* ── Success Screen ── */
+  .success-screen {
+    display: none;
+    text-align: center;
+    padding: 48px 20px;
+  }
+  .success-screen.visible { display: block; }
+  .success-icon {
+    width: 56px;
+    height: 56px;
+    border: 1.5px solid var(--copper);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+  }
+  .success-icon svg { stroke: var(--copper); }
+  .success-screen h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    font-weight: 500;
+    margin-bottom: 12px;
+  }
+  .success-screen p {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.7;
+    max-width: 360px;
+    margin: 0 auto 28px;
+  }
+  .success-screen .ref-code {
+    display: inline-block;
+    font-family: monospace;
+    font-size: 12px;
+    background: var(--graphite-2);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 6px 14px;
+    color: var(--copper-light);
+    letter-spacing: 2px;
+    margin-bottom: 28px;
+  }
+  .btn-restart {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    background: none;
+    border: none;
+  }
+  .btn-restart:hover { color: var(--bone); }
+
+  /* ── Loading overlay ── */
+  .sending-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(26,26,26,.8);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .sending-overlay.visible { display: flex; }
+  .spinner {
+    width: 36px;
+    height: 36px;
+    border: 2px solid var(--border);
+    border-top-color: var(--copper);
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .sending-overlay p { font-size: 13px; color: var(--muted); letter-spacing: 1px; }
+
+  /* ── Scrollbar ── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--graphite-2); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div class="form-shell">
+
+  <!-- Header -->
+  <div class="form-header">
+    <span class="eyebrow">Cage Art Studio</span>
+    <h1>Özel Silikon Kalıp Talebi</h1>
+    <p>Modelinizin fotoğrafını ve ölçülerini paylaşın — size en kısa sürede dönelim.</p>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-bar" id="progressBar">
+    <div class="step-dot active" id="sdot-1">
+      <div class="dot">1</div>
+      <span class="label">Model</span>
+    </div>
+    <div class="step-connector" id="sc-1"></div>
+    <div class="step-dot" id="sdot-2">
+      <div class="dot">2</div>
+      <span class="label">Tasarım</span>
+    </div>
+    <div class="step-connector" id="sc-2"></div>
+    <div class="step-dot" id="sdot-3">
+      <div class="dot">3</div>
+      <span class="label">İletişim</span>
+    </div>
+  </div>
+
+  <!-- Card -->
+  <div class="form-card" id="formCard">
+
+    <!-- ═══════════════════════════════ STEP 1 ═══════════════════════════════ -->
+    <div class="step-panel active" id="step-1">
+      <div class="step-title">Model Bilgileri</div>
+      <div class="step-desc">Kalıbını yaptırmak istediğiniz modelin fotoğrafını ve ölçülerini girin.</div>
+
+      <!-- Fotoğraf -->
+      <div class="field-group" id="fg-photos">
+        <label>Model Fotoğrafları <span class="req">*</span></label>
+        <div class="upload-zone" id="photoZone">
+          <input type="file" id="photoFiles" accept="image/*" multiple>
+          <svg class="upload-icon" viewBox="0 0 32 32" fill="none" stroke="#7a7169" stroke-width="1.5">
+            <rect x="2" y="8" width="28" height="20" rx="2"/>
+            <circle cx="16" cy="18" r="5"/>
+            <path d="M10 8V6a2 2 0 012-2h8a2 2 0 012 2v2"/>
+          </svg>
+          <div class="uz-label"><span>Fotoğraf seçin</span> veya sürükleyip bırakın</div>
+          <div class="uz-types">JPG, PNG, WEBP · Birden fazla açı önerilir</div>
+        </div>
+        <div class="file-list" id="photoList"></div>
+        <div class="field-error" id="err-photos">En az bir fotoğraf yüklemeniz gerekiyor.</div>
+      </div>
+
+      <!-- Ölçüler -->
+      <div class="field-group" id="fg-dimensions">
+        <label>Detaylı Ölçüler <span class="req">*</span></label>
+        <textarea id="dimensions" placeholder="Örn: Uzunluk 12 cm, Genişlik 8 cm, Yükseklik 4 cm. Çıkıntı çapı 1.5 cm, derinlik 3 mm..."></textarea>
+        <div class="field-hint">Tüm kritik ölçüleri milimetre veya santimetre cinsinden belirtin.</div>
+        <div class="field-error" id="err-dimensions">Lütfen ölçüleri girin.</div>
+      </div>
+
+      <!-- Adet -->
+      <div class="field-row">
+        <div class="field-group" id="fg-quantity">
+          <label>Tahmini Adet <span class="req">*</span></label>
+          <select id="quantity">
+            <option value="">Seçin</option>
+            <option value="1">1 adet</option>
+            <option value="2-5">2–5 adet</option>
+            <option value="6-10">6–10 adet</option>
+            <option value="10+">10+ adet</option>
+          </select>
+          <div class="field-error" id="err-quantity">Lütfen adet seçin.</div>
+        </div>
+        <div class="field-group">
+          <label>Kullanım Amacı</label>
+          <select id="useCase">
+            <option value="">Seçin (opsiyonel)</option>
+            <option value="Mum">Mum dökümü</option>
+            <option value="Sabun">Sabun yapımı</option>
+            <option value="Reçine">Reçine dökümü</option>
+            <option value="Beton/Çimento">Beton / çimento</option>
+            <option value="Jesmonite">Jesmonite</option>
+            <option value="Diğer">Diğer</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Notlar -->
+      <div class="field-group">
+        <label>Ek Notlar</label>
+        <textarea id="notes1" placeholder="Özel istekler, dikkat edilmesini istediğiniz noktalar..." style="min-height:72px;"></textarea>
+      </div>
+
+      <div class="btn-row">
+        <div></div>
+        <button class="btn btn-primary" onclick="goToStep(2)">İleri →</button>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════ STEP 2 ═══════════════════════════════ -->
+    <div class="step-panel" id="step-2">
+      <div class="step-title">3D Tasarım Dosyası</div>
+      <div class="step-desc">Modelinize ait bir 3D dosyanız var mı?</div>
+
+      <div class="field-group" id="fg-designOption">
+        <div class="radio-cards">
+          <label class="radio-card" onclick="handleDesignOption('has')">
+            <input type="radio" name="designOption" value="has">
+            <div class="rc-icon">📁</div>
+            <div class="rc-title">Evet, dosyam var</div>
+            <div class="rc-desc">STL, STEP, OBJ veya benzeri bir 3D dosyası yükleyeceğim.</div>
+          </label>
+          <label class="radio-card" onclick="handleDesignOption('needs')">
+            <input type="radio" name="designOption" value="needs">
+            <div class="rc-icon">✏️</div>
+            <div class="rc-title">Hayır, tasarım lazım</div>
+            <div class="rc-desc">3D tasarımın da yapılmasını istiyorum.</div>
+          </label>
+        </div>
+        <div class="field-error" id="err-designOption">Lütfen bir seçenek belirleyin.</div>
+      </div>
+
+      <!-- Dosya var → yükleme alanı -->
+      <div class="conditional-panel" id="panel-hasFile">
+        <div class="field-group">
+          <label>3D Dosyasını Yükle</label>
+          <div class="upload-zone" id="cadZone">
+            <input type="file" id="cadFiles" accept=".stl,.step,.stp,.obj,.3mf,.iges,.igs" multiple>
+            <svg class="upload-icon" viewBox="0 0 32 32" fill="none" stroke="#7a7169" stroke-width="1.5">
+              <path d="M16 4v16M8 12l8-8 8 8"/>
+              <path d="M4 24h24v4H4z"/>
+            </svg>
+            <div class="uz-label"><span>Dosya seçin</span> veya sürükleyip bırakın</div>
+            <div class="uz-types">STL · STEP · OBJ · 3MF · IGES</div>
+          </div>
+          <div class="file-list" id="cadList"></div>
+        </div>
+        <div class="info-box">
+          ✓ Dosyanız alındığında boyutları ve geometriyi kontrol ediyor, gerekirse sizinle iletişime geçiyoruz.
+        </div>
+      </div>
+
+      <!-- Tasarım lazım → bilgi kutusu -->
+      <div class="conditional-panel" id="panel-needsDesign">
+        <div class="info-box warning">
+          ✏️ 3D tasarım hizmetimiz ücret gerektirmektedir. Talebinizi aldıktan sonra fiyat ve süre bilgisi için sizinle iletişime geçeceğiz.
+        </div>
+        <div class="field-group" style="margin-top:16px;">
+          <label>Referans / İlham Görseli (opsiyonel)</label>
+          <div class="upload-zone" id="refZone">
+            <input type="file" id="refFiles" accept="image/*,.pdf" multiple>
+            <svg class="upload-icon" viewBox="0 0 32 32" fill="none" stroke="#7a7169" stroke-width="1.5">
+              <rect x="2" y="4" width="28" height="24" rx="2"/>
+              <path d="M2 20l7-7 5 5 5-7 7 9"/>
+            </svg>
+            <div class="uz-label"><span>Görsel veya PDF seçin</span> (opsiyonel)</div>
+            <div class="uz-types">JPG · PNG · PDF</div>
+          </div>
+          <div class="file-list" id="refList"></div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="goToStep(1)">← Geri</button>
+        <button class="btn btn-primary" onclick="goToStep(3)">İleri →</button>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════ STEP 3 ═══════════════════════════════ -->
+    <div class="step-panel" id="step-3">
+      <div class="step-title">İletişim Bilgileri</div>
+      <div class="step-desc">Talep özetini inceleyin ve bilgilerinizi girin.</div>
+
+      <!-- Özet -->
+      <div class="summary-block">
+        <div class="sb-label">Talep Özeti</div>
+        <div id="summaryContent"></div>
+      </div>
+
+      <hr class="form-divider">
+
+      <div class="field-row">
+        <div class="field-group" id="fg-name">
+          <label>Adınız Soyadınız <span class="req">*</span></label>
+          <input type="text" id="contactName" placeholder="Ad Soyad">
+          <div class="field-error" id="err-name">Lütfen adınızı girin.</div>
+        </div>
+        <div class="field-group" id="fg-email">
+          <label>E-posta <span class="req">*</span></label>
+          <input type="email" id="contactEmail" placeholder="ornek@mail.com">
+          <div class="field-error" id="err-email">Geçerli bir e-posta girin.</div>
+        </div>
+      </div>
+
+      <div class="field-group" id="fg-phone">
+        <label>Telefon <span class="req">*</span></label>
+        <input type="tel" id="contactPhone" placeholder="05xx xxx xx xx">
+        <div class="field-error" id="err-phone">Lütfen telefon numaranızı girin.</div>
+      </div>
+
+      <div class="field-group">
+        <label>Şirket / Marka (opsiyonel)</label>
+        <input type="text" id="contactCompany" placeholder="Şirket adı">
+      </div>
+
+      <div class="kvkk-check" id="fg-kvkk">
+        <input type="checkbox" id="kvkkCheck">
+        <label for="kvkkCheck">Kişisel verilerimin Cage Art Studio tarafından talep sürecinde işlenmesine onay veriyorum.</label>
+      </div>
+      <div class="field-error" id="err-kvkk" style="margin-top:6px;">Bu kutucuğu işaretlemeniz gerekiyor.</div>
+
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="goToStep(2)">← Geri</button>
+        <button class="btn btn-primary" id="submitBtn" onclick="submitForm()">Talebi Gönder</button>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════ SUCCESS ═══════════════════════════════ -->
+    <div class="success-screen" id="successScreen">
+      <div class="success-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+      <h2>Talebiniz Alındı</h2>
+      <p>En kısa sürede inceleyip sizinle iletişime geçeceğiz. Referans kodunuzu saklayın.</p>
+      <div class="ref-code" id="refCode"></div>
+      <br>
+      <button class="btn-restart" onclick="restartForm()">Yeni talep oluştur</button>
+    </div>
+
+  </div><!-- /form-card -->
+
+</div><!-- /form-shell -->
+
+<!-- Sending overlay -->
+<div class="sending-overlay" id="sendingOverlay">
+  <div class="spinner"></div>
+  <p>Gönderiliyor...</p>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// ⚙️  EMAILJS AYARLARI — kendi bilgilerinizle doldurun
+// ═══════════════════════════════════════════════════════
+const EMAILJS_PUBLIC_KEY  = 'hBtChkuUBN1-ul0Cd';
+const EMAILJS_SERVICE_ID  = 'service_lvfso0o';
+const EMAILJS_TEMPLATE_ID = 'template_b1v5fnl';
+// ═══════════════════════════════════════════════════════
+
+emailjs.init(EMAILJS_PUBLIC_KEY);
+
+// State
+let currentStep = 1;
+const photoFilesStore = [];
+const cadFilesStore   = [];
+const refFilesStore   = [];
+
+// ── Step navigation ──────────────────────────────────
+function goToStep(n) {
+  if (n > currentStep && !validateStep(currentStep)) return;
+
+  if (n === 3) buildSummary();
+
+  document.getElementById(`step-${currentStep}`).classList.remove('active');
+  currentStep = n;
+  document.getElementById(`step-${currentStep}`).classList.add('active');
+  updateProgress();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateProgress() {
+  [1,2,3].forEach(i => {
+    const dot = document.getElementById(`sdot-${i}`);
+    dot.classList.remove('active','done');
+    if (i < currentStep)      dot.classList.add('done');
+    else if (i === currentStep) dot.classList.add('active');
+  });
+  [1,2].forEach(i => {
+    const conn = document.getElementById(`sc-${i}`);
+    conn.classList.toggle('done', currentStep > i);
+  });
+}
+
+// ── Validation ───────────────────────────────────────
+function validateStep(n) {
+  if (n === 1) return validateStep1();
+  if (n === 2) return validateStep2();
+  if (n === 3) return validateStep3();
+  return true;
+}
+
+function setError(fgId, errId, show) {
+  const fg  = document.getElementById(fgId);
+  const err = document.getElementById(errId);
+  if (!fg || !err) return;
+  fg.classList.toggle('has-error', show);
+  err.style.display = show ? 'block' : 'none';
+}
+
+function validateStep1() {
+  let ok = true;
+  if (photoFilesStore.length === 0) { setError('fg-photos', 'err-photos', true); ok = false; }
+  else setError('fg-photos', 'err-photos', false);
+
+  const dim = document.getElementById('dimensions').value.trim();
+  if (!dim) { setError('fg-dimensions', 'err-dimensions', true); ok = false; }
+  else setError('fg-dimensions', 'err-dimensions', false);
+
+  const qty = document.getElementById('quantity').value;
+  if (!qty) { setError('fg-quantity', 'err-quantity', true); ok = false; }
+  else setError('fg-quantity', 'err-quantity', false);
+
+  return ok;
+}
+
+function validateStep2() {
+  const chosen = document.querySelector('input[name="designOption"]:checked');
+  if (!chosen) { setError('fg-designOption', 'err-designOption', true); return false; }
+  setError('fg-designOption', 'err-designOption', false);
+  return true;
+}
+
+function validateStep3() {
+  let ok = true;
+  const name = document.getElementById('contactName').value.trim();
+  if (!name) { setError('fg-name', 'err-name', true); ok = false; }
+  else setError('fg-name', 'err-name', false);
+
+  const email = document.getElementById('contactEmail').value.trim();
+  const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  if (!emailOk) { setError('fg-email', 'err-email', true); ok = false; }
+  else setError('fg-email', 'err-email', false);
+
+  const phone = document.getElementById('contactPhone').value.trim();
+  if (!phone) { setError('fg-phone', 'err-phone', true); ok = false; }
+  else setError('fg-phone', 'err-phone', false);
+
+  const kvkk = document.getElementById('kvkkCheck').checked;
+  const kvkkFg = document.getElementById('fg-kvkk');
+  const kvkkErr = document.getElementById('err-kvkk');
+  if (!kvkk) {
+    kvkkFg.style.outline = '1px solid var(--error)';
+    kvkkFg.style.borderRadius = '3px';
+    kvkkErr.style.display = 'block';
+    ok = false;
+  } else {
+    kvkkFg.style.outline = '';
+    kvkkErr.style.display = 'none';
+  }
+
+  return ok;
+}
+
+// ── File uploads ─────────────────────────────────────
+function setupUpload(inputId, store, listId, zoneId) {
+  const input = document.getElementById(inputId);
+  const zone  = document.getElementById(zoneId);
+
+  input.addEventListener('change', () => addFiles(input.files, store, listId));
+
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault();
+    zone.classList.remove('drag-over');
+    addFiles(e.dataTransfer.files, store, listId);
+  });
+}
+
+function addFiles(files, store, listId) {
+  Array.from(files).forEach(f => {
+    if (!store.find(x => x.name === f.name && x.size === f.size)) store.push(f);
+  });
+  renderFileList(store, listId);
+}
+
+function renderFileList(store, listId) {
+  const list = document.getElementById(listId);
+  list.innerHTML = '';
+  store.forEach((f, i) => {
+    const chip = document.createElement('div');
+    chip.className = 'file-chip';
+    chip.innerHTML = `
+      <span class="fc-name">${f.name}</span>
+      <span class="fc-size">${formatBytes(f.size)}</span>
+      <span class="fc-remove" onclick="removeFile(${i}, this.closest('.file-chip'))">×</span>
+    `;
+    // store reference for removal
+    chip.querySelector('.fc-remove').addEventListener('click', () => {
+      store.splice(i, 1);
+      renderFileList(store, listId);
+    });
+    list.appendChild(chip);
+  });
+}
+
+function formatBytes(b) {
+  if (b < 1024) return b + ' B';
+  if (b < 1048576) return (b/1024).toFixed(1) + ' KB';
+  return (b/1048576).toFixed(1) + ' MB';
+}
+
+setupUpload('photoFiles', photoFilesStore, 'photoList', 'photoZone');
+setupUpload('cadFiles',   cadFilesStore,   'cadList',   'cadZone');
+setupUpload('refFiles',   refFilesStore,   'refList',   'refZone');
+
+// ── Design option toggle ──────────────────────────────
+function handleDesignOption(val) {
+  document.getElementById('panel-hasFile').classList.toggle('visible', val === 'has');
+  document.getElementById('panel-needsDesign').classList.toggle('visible', val === 'needs');
+  setError('fg-designOption', 'err-designOption', false);
+}
+
+// ── Summary builder ───────────────────────────────────
+function buildSummary() {
+  const chosen  = document.querySelector('input[name="designOption"]:checked');
+  const designLabel = chosen?.value === 'has' ? 'Evet, dosya yükleyeceğim' : 'Hayır, tasarım yapılmasını istiyorum';
+
+  const photoNames = photoFilesStore.map(f => f.name);
+  const cadNames   = cadFilesStore.map(f => f.name);
+
+  const rows = [
+    { k: 'Ölçüler', v: document.getElementById('dimensions').value.trim() },
+    { k: 'Adet',    v: document.getElementById('quantity').value },
+    { k: 'Kullanım', v: document.getElementById('useCase').value || '—' },
+    { k: '3D Dosya', v: designLabel },
+  ];
+
+  let html = rows.map(r => `
+    <div class="sb-row">
+      <span class="sbr-key">${r.k}</span>
+      <span class="sbr-val">${r.v}</span>
+    </div>`).join('');
+
+  if (photoNames.length) {
+    html += `<div class="sb-row">
+      <span class="sbr-key">Fotoğraflar</span>
+      <span class="sbr-val">
+        <div class="sb-files">${photoNames.map(n=>`<span class="sb-file-tag">${n}</span>`).join('')}</div>
+      </span>
+    </div>`;
+  }
+  if (cadNames.length) {
+    html += `<div class="sb-row">
+      <span class="sbr-key">3D Dosyalar</span>
+      <span class="sbr-val">
+        <div class="sb-files">${cadNames.map(n=>`<span class="sb-file-tag">${n}</span>`).join('')}</div>
+      </span>
+    </div>`;
+  }
+
+  document.getElementById('summaryContent').innerHTML = html;
+}
+
+// ── Submit ────────────────────────────────────────────
+async function submitForm() {
+  if (!validateStep3()) return;
+
+  const chosen = document.querySelector('input[name="designOption"]:checked');
+  const refCode = 'CA-' + Date.now().toString(36).toUpperCase();
+
+  const params = {
+    ref_code:      refCode,
+    customer_name: document.getElementById('contactName').value.trim(),
+    customer_email:document.getElementById('contactEmail').value.trim(),
+    customer_phone:document.getElementById('contactPhone').value.trim(),
+    customer_company: document.getElementById('contactCompany').value.trim() || '—',
+    dimensions:    document.getElementById('dimensions').value.trim(),
+    quantity:      document.getElementById('quantity').value,
+    use_case:      document.getElementById('useCase').value || '—',
+    design_option: chosen?.value === 'has' ? 'Dosya var (yüklendi)' : 'Tasarım yapılmasını istiyor',
+    notes:         document.getElementById('notes1').value.trim() || '—',
+    photo_count:   photoFilesStore.length + ' fotoğraf',
+    cad_count:     cadFilesStore.length > 0 ? cadFilesStore.length + ' dosya' : '—',
+    photo_names:   photoFilesStore.map(f=>f.name).join(', ') || '—',
+    cad_names:     cadFilesStore.map(f=>f.name).join(', ') || '—',
+  };
+
+  document.getElementById('sendingOverlay').classList.add('visible');
+  document.getElementById('submitBtn').disabled = true;
+
+  try {
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params);
+    document.getElementById('sendingOverlay').classList.remove('visible');
+    // Show success
+    document.getElementById('step-3').classList.remove('active');
+    document.getElementById('successScreen').classList.add('visible');
+    document.getElementById('refCode').textContent = refCode;
+    // Hide progress
+    document.getElementById('progressBar').style.display = 'none';
+  } catch(err) {
+    document.getElementById('sendingOverlay').classList.remove('visible');
+    document.getElementById('submitBtn').disabled = false;
+    alert('Gönderilemedi: ' + (err?.text || err?.message || 'Bilinmeyen hata') + '\n\nEmailJS ayarlarını kontrol edin.');
+    console.error(err);
+  }
+}
+
+// ── Restart ───────────────────────────────────────────
+function restartForm() {
+  location.reload();
+}
+</script>
+</body>
+</html>
