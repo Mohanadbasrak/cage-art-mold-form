@@ -14,8 +14,8 @@
     --bg-3:       #f0f0f0;
     --black:      #000000;
     --black-2:    #111111;
-    --muted:      #888888;
-    --muted-2:    #555555;
+    --muted:      #444444;
+    --muted-2:    #222222;
     --border:     #e0e0e0;
     --border-2:   #cccccc;
     --error:      #e53935;
@@ -28,7 +28,7 @@
     background: var(--bg);
     color: var(--black);
     font-family: 'Poppins', sans-serif;
-    font-weight: 300;
+    font-weight: 500;
     min-height: 100vh;
   }
 
@@ -48,7 +48,7 @@
     font-weight: 500;
     letter-spacing: 4px;
     text-transform: uppercase;
-    color: var(--muted);
+    color: var(--muted-2);
     margin-bottom: 16px;
     display: block;
   }
@@ -62,11 +62,11 @@
   }
   .form-header p {
     font-size: 13px;
-    color: var(--muted);
+    color: var(--muted-2);
     line-height: 1.7;
     max-width: 420px;
     margin: 0 auto;
-    font-weight: 300;
+    font-weight: 500;
   }
 
   /* ── Progress ── */
@@ -94,7 +94,7 @@
     justify-content: center;
     font-size: 11px;
     font-weight: 500;
-    color: var(--muted);
+    color: var(--muted-2);
     transition: all .3s ease;
     position: relative;
     z-index: 1;
@@ -103,10 +103,10 @@
     font-size: 9px;
     letter-spacing: 1.5px;
     text-transform: uppercase;
-    color: var(--muted);
+    color: var(--muted-2);
     white-space: nowrap;
     transition: color .3s ease;
-    font-weight: 400;
+    font-weight: 500;
   }
   .step-dot.active .dot {
     border-color: var(--black);
@@ -151,10 +151,10 @@
   }
   .step-desc {
     font-size: 12px;
-    color: var(--muted);
+    color: var(--muted-2);
     margin-bottom: 32px;
     line-height: 1.6;
-    font-weight: 300;
+    font-weight: 500;
   }
 
   /* ── Fields ── */
@@ -182,7 +182,7 @@
     color: var(--black);
     font-family: 'Poppins', sans-serif;
     font-size: 13px;
-    font-weight: 300;
+    font-weight: 500;
     padding: 12px 14px;
     outline: none;
     transition: border-color .2s ease;
@@ -205,16 +205,17 @@
 
   .field-hint {
     font-size: 11px;
-    color: var(--muted);
+    color: var(--muted-2);
     margin-top: 6px;
     line-height: 1.5;
+    font-weight: 500;
   }
   .field-error {
     font-size: 11px;
     color: var(--error);
     margin-top: 6px;
     display: none;
-    font-weight: 400;
+    font-weight: 500;
   }
   .field-group.has-error input,
   .field-group.has-error textarea,
@@ -256,9 +257,9 @@
   }
   .upload-zone .uz-label {
     font-size: 13px;
-    color: var(--muted);
+    color: var(--muted-2);
     line-height: 1.6;
-    font-weight: 300;
+    font-weight: 500;
   }
   .upload-zone .uz-label span {
     color: var(--black);
@@ -267,7 +268,7 @@
   }
   .upload-zone .uz-types {
     font-size: 10px;
-    color: var(--muted);
+    color: var(--muted-2);
     margin-top: 6px;
     letter-spacing: .5px;
   }
@@ -292,7 +293,7 @@
   .file-chip .fc-size { color: var(--muted); font-size: 11px; flex-shrink: 0; }
   .file-chip .fc-remove {
     cursor: pointer;
-    color: var(--muted);
+    color: var(--muted-2);
     font-size: 16px;
     line-height: 1;
     flex-shrink: 0;
@@ -333,9 +334,9 @@
   }
   .radio-card .rc-desc {
     font-size: 11px;
-    color: var(--muted);
+    color: var(--muted-2);
     line-height: 1.5;
-    font-weight: 300;
+    font-weight: 500;
   }
   .radio-card:has(input:checked) .rc-title { color: var(--black); }
 
@@ -351,7 +352,7 @@
     color: var(--muted-2);
     line-height: 1.7;
     margin-top: 16px;
-    font-weight: 300;
+    font-weight: 500;
   }
   .info-box.warning {
     background: var(--bg-2);
@@ -408,7 +409,7 @@
   .btn-primary:disabled { opacity: .35; cursor: not-allowed; }
   .btn-ghost {
     background: transparent;
-    color: var(--muted);
+    color: var(--muted-2);
     border: 1px solid var(--border);
     padding: 13px 20px;
   }
@@ -427,7 +428,7 @@
     font-weight: 500;
     letter-spacing: 2.5px;
     text-transform: uppercase;
-    color: var(--muted);
+    color: var(--muted-2);
     margin-bottom: 12px;
   }
   .sb-row {
@@ -440,8 +441,8 @@
     font-size: 13px;
   }
   .sb-row:last-child { border-bottom: none; }
-  .sb-row .sbr-key { color: var(--muted); font-size: 11px; flex-shrink: 0; font-weight: 300; }
-  .sb-row .sbr-val { color: var(--black); text-align: right; word-break: break-word; font-weight: 300; }
+  .sb-row .sbr-key { color: var(--muted); font-size: 11px; flex-shrink: 0; font-weight: 500; }
+  .sb-row .sbr-val { color: var(--black); text-align: right; word-break: break-word; font-weight: 500; }
   .sb-files { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 6px; }
   .sb-file-tag {
     font-size: 10px;
@@ -468,12 +469,12 @@
   }
   .kvkk-check label {
     font-size: 12px;
-    color: var(--muted);
+    color: var(--muted-2);
     line-height: 1.6;
     cursor: pointer;
     text-transform: none;
     letter-spacing: 0;
-    font-weight: 300;
+    font-weight: 500;
   }
 
   /* ── Success Screen ── */
@@ -503,11 +504,11 @@
   }
   .success-screen p {
     font-size: 13px;
-    color: var(--muted);
+    color: var(--muted-2);
     line-height: 1.7;
     max-width: 340px;
     margin: 0 auto 28px;
-    font-weight: 300;
+    font-weight: 500;
   }
   .success-screen .ref-code {
     display: inline-block;
@@ -527,7 +528,7 @@
     font-weight: 500;
     letter-spacing: 2px;
     text-transform: uppercase;
-    color: var(--muted);
+    color: var(--muted-2);
     cursor: pointer;
     text-decoration: underline;
     text-underline-offset: 3px;
@@ -562,10 +563,10 @@
   @keyframes spin { to { transform: rotate(360deg); } }
   .sending-overlay p {
     font-size: 12px;
-    color: var(--muted);
+    color: var(--muted-2);
     letter-spacing: 1.5px;
     text-transform: uppercase;
-    font-weight: 400;
+    font-weight: 500;
   }
 
   /* ── Scrollbar ── */
