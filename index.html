@@ -1033,46 +1033,91 @@ function buildSummary() {
   document.getElementById('summaryContent').innerHTML = html;
 }
 
+// ── Helpers ───────────────────────────────────────────
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbySa-QBqGcEtyybMDUgDn1oesqPJb6XckxbvRzZTdHevKPDTeVSXuBkeShlavd4EV6Z/exec';
+
+function setOverlayMsg(msg) {
+  const p = document.querySelector('.sending-overlay p');
+  if (p) p.textContent = msg;
+}
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload  = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function uploadToDrive(refCode, allFiles) {
+  if (allFiles.length === 0) return [];
+  const filesPayload = await Promise.all(allFiles.map(async f => ({
+    name: f.name,
+    type: f.type || 'application/octet-stream',
+    data: await fileToBase64(f)
+  })));
+  const resp = await fetch(APPS_SCRIPT_URL, {
+    method: 'POST',
+    body: JSON.stringify({ ref_code: refCode, files: filesPayload })
+  });
+  const json = await resp.json();
+  if (!json.success) throw new Error('Drive yükleme hatası: ' + json.error);
+  return json.links;
+}
+
 // ── Submit ────────────────────────────────────────────
 async function submitForm() {
   if (!validateStep3()) return;
 
-  const chosen = document.querySelector('input[name="designOption"]:checked');
+  const chosen  = document.querySelector('input[name="designOption"]:checked');
   const refCode = 'CA-' + Date.now().toString(36).toUpperCase();
-
-  const params = {
-    ref_code:      refCode,
-    customer_name: document.getElementById('contactName').value.trim(),
-    customer_email:document.getElementById('contactEmail').value.trim(),
-    customer_phone:document.getElementById('contactPhone').value.trim(),
-    customer_company: document.getElementById('contactCompany').value.trim() || '—',
-    dimensions:    document.getElementById('dimensions').value.trim(),
-    quantity:      document.getElementById('quantity').value,
-    use_case:      document.getElementById('useCase').value || '—',
-    design_option: chosen?.value === 'has' ? 'Dosya var (yüklendi)' : 'Tasarım yapılmasını istiyor',
-    notes:         document.getElementById('notes1').value.trim() || '—',
-    photo_count:   photoFilesStore.length + ' fotoğraf',
-    cad_count:     cadFilesStore.length > 0 ? cadFilesStore.length + ' dosya' : '—',
-    photo_names:   photoFilesStore.map(f=>f.name).join(', ') || '—',
-    cad_names:     cadFilesStore.map(f=>f.name).join(', ') || '—',
-  };
 
   document.getElementById('sendingOverlay').classList.add('visible');
   document.getElementById('submitBtn').disabled = true;
 
   try {
-    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params);
+    const allFiles = [...photoFilesStore, ...cadFilesStore, ...refFilesStore];
+
+    setOverlayMsg('Dosyalar yükleniyor...');
+    const links = await uploadToDrive(refCode, allFiles);
+
+    const photoLinks = links.filter(l => photoFilesStore.some(f => f.name === l.name));
+    const cadLinks   = links.filter(l => cadFilesStore.some(f => f.name === l.name));
+    const refLinks   = links.filter(l => refFilesStore.some(f => f.name === l.name));
+
+    const formatLinks = arr => arr.length
+      ? arr.map(l => l.name + ': ' + l.url).join('\n')
+      : '—';
+
+    setOverlayMsg('Mail gönderiliyor...');
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+      ref_code:        refCode,
+      customer_name:   document.getElementById('contactName').value.trim(),
+      customer_email:  document.getElementById('contactEmail').value.trim(),
+      customer_phone:  document.getElementById('contactPhone').value.trim(),
+      customer_company:document.getElementById('contactCompany').value.trim() || '—',
+      dimensions:      document.getElementById('dimensions').value.trim(),
+      quantity:        document.getElementById('quantity').value,
+      use_case:        document.getElementById('useCase').value || '—',
+      design_option:   chosen?.value === 'has' ? "Dosya var (Drive'a yüklendi)" : 'Tasarım yapılmasını istiyor',
+      notes:           document.getElementById('notes1').value.trim() || '—',
+      photo_links:     formatLinks(photoLinks),
+      cad_links:       formatLinks(cadLinks),
+      ref_image_links: formatLinks(refLinks),
+    });
+
     document.getElementById('sendingOverlay').classList.remove('visible');
-    // Show success
     document.getElementById('step-3').classList.remove('active');
     document.getElementById('successScreen').classList.add('visible');
     document.getElementById('refCode').textContent = refCode;
-    // Hide progress
     document.getElementById('progressBar').style.display = 'none';
+
   } catch(err) {
     document.getElementById('sendingOverlay').classList.remove('visible');
     document.getElementById('submitBtn').disabled = false;
-    alert('Gönderilemedi: ' + (err?.text || err?.message || 'Bilinmeyen hata') + '\n\nEmailJS ayarlarını kontrol edin.');
+    setOverlayMsg('Gönderiliyor...');
+    alert('Hata oluştu:\n' + (err?.text || err?.message || JSON.stringify(err)));
     console.error(err);
   }
 }
